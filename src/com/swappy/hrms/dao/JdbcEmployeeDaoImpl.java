@@ -1,5 +1,6 @@
 package com.swappy.hrms.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.sql.*;
@@ -9,60 +10,117 @@ import com.swappy.hrms.util.*;
 
 public class JdbcEmployeeDaoImpl implements EmployeeDao{
 
-	public static String driver ="oracle.jdbc.driver.OracleDriver";
-    public  static String dbUrl ="jdbc:oracle:thin:@localhost:1521:xe";
-    public static String user="system" , password ="root";
+
     public static Scanner sc = new Scanner(System.in);
-    
-    public int empNo;
-    public String empName="";
-    public String empAddress="";
-    
-    
+ 
+ 
 	@Override
 	public boolean insert(Employee e) {
 		// TODO Auto-generated method stub
 		
 		Connection con =null;
 		PreparedStatement pst=null;
+		boolean isInserted = false;
 		
 		try {
-			con = ConnectionFactory.getConnection(driver, dbUrl,user, password);
+			con = ConnectionFactory.getConnection(DBConstants.DRIVER,DBConstants.URL,DBConstants.USERNAME,DBConstants.PASSWORD);
 			if(con!=null) {
-				
-				System.out.println("Enter employee id = ");
-				empNo = sc.nextInt();
-				System.out.println("Enter employee name = ");
-				empName = sc.next();
-				System.out.println("Enter employee address = ");
-				empAddress = sc.next();
+ 
 				pst = con.prepareStatement("insert into emp values(?,?,?)");
-				
-				
-				pst.setInt(empNo, 1);
-				pst.setString(2,empName);
-				
-				
+ 
+				pst.setInt(1, e.getEno());
+				pst.setString(2,e.getName());
+				pst.setString(3,e.getAddress());
+				int i = pst.executeUpdate();
+				if(i>0) {
+					isInserted = true;
+					System.out.println("Employee "+e.getName()+" inserted ");
+				}
 				
 			}
 			
 		}catch(Exception e1) {
-			
+			e1.printStackTrace();
+		}finally {
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
 		
-		
-		return false;
+		return isInserted;
 	}
 
 	@Override
-	public void get(int eno) {
-		// TODO Auto-generated method stub
+	public Employee get(int eno) {
+		Connection con =null;
+		PreparedStatement pst=null;
+		ResultSet rs = null;
+		Employee e = null;
+
+		try {
+			con = ConnectionFactory.getConnection(DBConstants.DRIVER,DBConstants.URL,DBConstants.USERNAME,DBConstants.PASSWORD);
+			if(con!=null) {
+ 
+				pst = con.prepareStatement("select * from emp where eno=?");
+				rs = pst.executeQuery();
+				rs.next();
+				
+				e = new Employee(rs.getInt("emp_no"),rs.getString("emp_name"),rs.getString("emp_address"));
+				return e;
+			}
+			
+		}catch(Exception e1) {
+			e1.printStackTrace();
+		}finally {
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 		
+		return null;
 	}
 
 	@Override
 	public List<Employee> getAll() {
-		// TODO Auto-generated method stub
+		
+		Connection con =null;
+		PreparedStatement pst=null;
+		ResultSet rs = null;
+		Employee e = null;
+		List<Employee> lst = new ArrayList<>();
+
+		try {
+			con = ConnectionFactory.getConnection(DBConstants.DRIVER,DBConstants.URL,DBConstants.USERNAME,DBConstants.PASSWORD);
+			if(con!=null) {
+				
+				pst = con.prepareStatement("select * from emp ");
+				rs = pst.executeQuery();
+				
+				while(rs.next()) {
+					e = new Employee(rs.getInt("emp_no"),rs.getString("emp_name"),rs.getString("emp_address"));
+					lst.add(e);
+				}
+				
+			}
+			return lst;
+			
+		}catch(Exception e1) {
+			e1.printStackTrace();
+		}finally {
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
 		return null;
 	}
 
