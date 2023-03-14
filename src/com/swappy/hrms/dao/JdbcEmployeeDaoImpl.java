@@ -126,8 +126,38 @@ public class JdbcEmployeeDaoImpl implements EmployeeDao{
 
 	@Override
 	public boolean delete(int eno) {
-		// TODO Auto-generated method stub
-		return false;
+		Connection con =null;
+		PreparedStatement pst=null;
+		boolean isDeleted = false;
+		
+		try {
+			con = ConnectionFactory.getConnection(DBConstants.DRIVER,DBConstants.URL,DBConstants.USERNAME,DBConstants.PASSWORD);
+			if(con!=null) {
+ 
+				pst = con.prepareStatement("delete from emp where emp_no=?");
+				pst.setInt(1, eno);
+				int i = pst.executeUpdate();
+				if(i>0) {
+					System.out.println("Employee with employee_id : "+eno+" deleted");
+				}else {
+					System.out.println("404");
+				}
+				
+			}
+			
+		}catch(Exception e1) {
+			e1.printStackTrace();
+		}finally {
+			try {
+				con.close();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
+		return isDeleted;
+
 	}
 
 	@Override
