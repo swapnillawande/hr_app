@@ -22,7 +22,9 @@ public class Test {
 //			System.out.println(e.getName());
 //		}
 
-		dao.delete(2);
+//		dao.delete(2);
+//		Employee e = new Employee(101,"Swappy","Mumbai");
+//		dao.update(1, e);
 		
 	}
 

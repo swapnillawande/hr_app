@@ -162,10 +162,42 @@ public class JdbcEmployeeDaoImpl implements EmployeeDao{
 
 	@Override
 	public boolean update(int eno, Employee e) {
-		// TODO Auto-generated method stub
+		Connection con =null;
+		PreparedStatement st =null;
+		
+		try {
+			
+			con = ConnectionFactory.getConnection(DBConstants.DRIVER,DBConstants.URL,DBConstants.USERNAME,DBConstants.PASSWORD);
+			if(con!=null) {
+				st = con.prepareStatement("update emp set emp_no=?,emp_name=?,emp_address=? where emp_no=?");
+				st.setInt(1, e.getEno());
+				st.setString(2, e.getName());
+				st.setString(3, e.getAddress());
+				st.setInt(4, eno);
+				
+				int i = st.executeUpdate();
+				if(i>0) {
+					System.out.println("Successfully updated ");
+					return true;
+				}else {
+					System.out.println("404");
+				}
+				
+			}
+			
+		}catch(Exception e1) {
+			e1.printStackTrace();
+		}finally {
+			
+			try {
+				con.close();
+			}catch(Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		
 		return false;
 	}
 
-	
 	
 }
